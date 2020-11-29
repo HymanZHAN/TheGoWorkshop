@@ -1,45 +1,44 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/csv"
 	"fmt"
-	"os"
+	"io"
+	"log"
+	"strings"
 )
 
-type person struct {
-	LastName  string  `json:"lname"`
-	FirstName string  `json:"fname"`
-	Address   address `json:"address"`
-}
-type address struct {
-	Street  string `json:"street"`
-	City    string `json:"city"`
-	State   string `json:"state"`
-	ZipCode int    `json:"zipcode"`
-}
-
 func main() {
-	p := person{LastName: "Vader", FirstName: "Darth"}
-	p.Address = address{
-		Street:  "Galaxy Far Away",
-		City:    "Dark Side",
-		State:   "Tatooine",
-		ZipCode: 12345,
-	}
+	in := `
+firstName, lastName, age
+Celina, Jones, 18
+Cailyn, Henderson, 13
+Cayden, Smith, 42
+`
 
-	noPrettyPrint, err := json.Marshal(p)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	header := true
+	r := csv.NewReader(strings.NewReader(in))
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	prettyPrint, err := json.MarshalIndent(p, "", "  ")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		if !header {
+			for idx, value := range record {
+				switch idx {
+				case 0:
+					fmt.Println("First Name: ", value)
+				case 1:
+					fmt.Println("Last Name: ", value)
+				case 2:
+					fmt.Println("Age: ", value)
+				}
+			}
+		}
+		header = false
 	}
-
-	fmt.Println(string(noPrettyPrint))
-	fmt.Println()
-	fmt.Println(string(prettyPrint))
 }
