@@ -1,17 +1,19 @@
 package main
 
-import "fmt"
+import "log"
 
 func main() {
-	a := 0
-	go next(&a)
-	go next(&a)
-	go next(&a)
-	fmt.Println(a)
+	ch := doSomething()
+	ch <- 1
+	ch <- 4
 }
 
-func next(v *int) {
-	fmt.Printf("Inside next: %d", *v)
-	c := *v
-	*v = c + 1
+func doSomething() chan<- int {
+	ch := make(chan int)
+	go func() {
+		for i := range ch {
+			log.Println(i)
+		}
+	}()
+	return ch
 }

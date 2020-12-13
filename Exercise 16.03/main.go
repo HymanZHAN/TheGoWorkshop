@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"sync"
+	"sync/atomic"
 )
 
 func main() {
@@ -19,8 +20,8 @@ func main() {
 
 func sum(from, to int, wg *sync.WaitGroup, res *int32) {
 	for i := from; i <= to; i++ {
-		// atomic.AddInt32(res, int32(i))
-		*res = *res + int32(i)
+		atomic.AddInt32(res, int32(i))
+		// *res = *res + int32(i)
 	}
 	wg.Done()
 	return
